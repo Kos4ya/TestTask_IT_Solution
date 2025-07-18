@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Цитатник</title>
+    <style>
+        .popular { color: green; }
+        .unpopular { color: red; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'random_quote' %}">Случайная цитата</a>
+        <a href="{% url 'top_quotes' %}">Топ цитат</a>
+        <a href="{% url 'add_quote' %}">Добавить цитату</a>
+        <a href="{% url 'source_list' %}">Все источники</a>
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>

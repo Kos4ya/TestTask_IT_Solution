@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
@@ -26,10 +27,11 @@ class Source(models.Model):
 
 class Quote(models.Model):
     text = models.TextField(unique=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     source = models.ForeignKey(Source, on_delete=models.SET_NULL, null=True, blank=True)
     weight = models.PositiveIntegerField(default=1)
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
+    likes = models.ManyToManyField(User, related_name='liked_quotes', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_quotes', blank=True)
     views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -44,8 +46,16 @@ class Quote(models.Model):
         return f"{self.text[:50]}... ({source_name})"
 
     @property
+    def likes_count(self):
+        return self.likes.count()
+
+    @property
+    def dislikes_count(self):
+        return self.dislikes.count()
+
+    @property
     def popularity(self):
-        return self.likes - self.dislikes
+        return self.likes_count - self.dislikes_count
 
     class Meta:
         ordering = ['-created_at']
