@@ -8,6 +8,7 @@ from django.views.generic import ListView, CreateView
 from random import choices
 from .models import Quote, Source, SourceType
 from .forms import QuoteForm, SourceForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class RandomQuoteView(View):
@@ -24,37 +25,24 @@ class RandomQuoteView(View):
 
         return render(request, 'random_quote.html', {
             'quote': selected_quote,
-            'popularity': selected_quote.popularity
+            'popularity': selected_quote.popularity,
+            'user': request.user
         })
 
 
-class AddQuoteView(View):
+class AddQuoteView(LoginRequiredMixin, View):
     def get(self, request):
-        form = QuoteForm()
+        form = QuoteForm(initial={'user': request.user})
         return render(request, 'add_quote.html', {'form': form})
 
     def post(self, request):
         form = QuoteForm(request.POST)
         if form.is_valid():
-            form.save()
+            quote = form.save(commit=False)
+            quote.author = request.user
+            quote.save()
             return redirect('random_quote')
         return render(request, 'add_quote.html', {'form': form})
-
-
-class AddSourceView(View):
-    def get(self, request):
-        form = SourceForm()
-        return render(request, 'add_source.html', {'form': form})
-
-    def post(self, request):
-        form = SourceForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('add_quote')
-        return render(request, 'add_source.html', {'form': form})
-
-
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class LikeDislikeView(LoginRequiredMixin, View):
@@ -89,6 +77,11 @@ class TopQuotesView(ListView):
     context_object_name = 'quotes'
     queryset = Quote.objects.order_by('-likes')[:10]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user  # Добавляем пользователя в контекст
+        return context
+
 
 class SourceListView(ListView):
     model = SourceType
@@ -97,6 +90,7 @@ class SourceListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
         source_id = self.kwargs.get('source_id')
 
         if source_id:

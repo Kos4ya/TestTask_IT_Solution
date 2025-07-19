@@ -5,9 +5,33 @@
     <style>
         .popular { color: green; }
         .unpopular { color: red; }
+        .auth-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: right;
+        }
+        nav {
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
+    <div class="auth-info">
+    {% if user.is_authenticated %}
+        Привет, {{ user.username }}! |
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: blue; cursor: pointer; text-decoration: underline; padding: 0;">
+                Выйти
+            </button>
+        </form>
+    {% else %}
+        <a href="{% url 'login' %}">Войти</a> |
+        <a href="{% url 'register' %}">Регистрация</a>
+    {% endif %}
+</div>
+
     <nav>
         <a href="{% url 'random_quote' %}">Случайная цитата</a>
         <a href="{% url 'top_quotes' %}">Топ цитат</a>

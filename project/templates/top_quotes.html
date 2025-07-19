@@ -1,0 +1,14 @@
+{% extends 'quotes/base.html' %}
+
+{% block content %}
+<h2>Топ 10 цитат</h2>
+<ol>
+    {% for quote in quotes %}
+    <li>
+        {{ quote.text }} 
+        <small>({{ quote.source|default:"Неизвестный источник" }})</small>
+        <span>👍 {{ quote.likes.count }} 👎 {{ quote.dislikes.count }}</span>
+    </li>
+    {% endfor %}
+</ol>
+{% endblock %}

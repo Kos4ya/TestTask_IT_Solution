@@ -1,0 +1,56 @@
+{% extends 'quotes/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if not user.is_authenticated %}
+    <div class="alert alert-info mb-4">
+        Чтобы ставить лайки, пожалуйста <a href="{% url 'login' %}?next={{ request.path }}">войдите</a>
+        или <a href="{% url 'register' %}">зарегистрируйтесь</a>.
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <blockquote class="blockquote mb-4">
+                <p class="font-italic">{{ quote.text }}</p>
+                <footer class="blockquote-footer">
+                    {% if quote.author %}{{ quote.author }}, {% endif %}
+                    <cite>{{ quote.source.name|default:"Неизвестный источник" }}</cite>
+                </footer>
+            </blockquote>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <small class="text-muted">
+                    Добавлено: {{ quote.created_at|date:"d.m.Y" }} пользователем
+                    {{ quote.author.username|default:"неизвестным" }} |
+                    Просмотров: {{ quote.views }}
+                </small>
+
+                <span class="badge {% if popularity > 0 %}bg-success{% elif popularity < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
+                    Рейтинг: {{ popularity }}
+                </span>
+            </div>
+
+            {% if user.is_authenticated %}
+            <div class="btn-group" role="group">
+                <form method="post" action="{% url 'like_dislike' quote.id 'like' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit" class="btn btn-outline-primary {% if user in quote.liked_by.all %}active{% endif %}">
+                        👍 {{ quote.liked_by.count }}
+                    </button>
+                </form>
+
+                <form method="post" action="{% url 'like_dislike' quote.id 'dislike' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit" class="btn btn-outline-danger {% if user in quote.disliked_by.all %}active{% endif %}">
+                        👎 {{ quote.disliked_by.count }}
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
