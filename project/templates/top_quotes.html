@@ -1,14 +1,35 @@
 {% extends 'quotes/base.html' %}
 
 {% block content %}
-<h2>Топ 10 цитат</h2>
-<ol>
-    {% for quote in quotes %}
-    <li>
-        {{ quote.text }} 
-        <small>({{ quote.source|default:"Неизвестный источник" }})</small>
-        <span>👍 {{ quote.likes.count }} 👎 {{ quote.dislikes.count }}</span>
-    </li>
-    {% endfor %}
-</ol>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="border-bottom pb-2"><i class="bi bi-trophy"></i> Топ 10 цитат</h2>
+        </div>
+    </div>
+
+    <div class="list-group">
+        {% for quote in quotes %}
+        <div class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-2">"{{ quote.text }}"</h5>
+                <div>
+                    <span class="badge bg-success rounded-pill me-1">
+                        <i class="bi bi-hand-thumbs-up"></i> {{ quote.likes.count }}
+                    </span>
+                    <span class="badge bg-danger rounded-pill">
+                        <i class="bi bi-hand-thumbs-down"></i> {{ quote.dislikes.count }}
+                    </span>
+                </div>
+            </div>
+            <p class="mb-1">
+                <small class="text-muted">
+                    {% if quote.author %}{{ quote.author }}{% endif %}
+                    {% if quote.source %} — {{ quote.source.name }}{% endif %}
+                </small>
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

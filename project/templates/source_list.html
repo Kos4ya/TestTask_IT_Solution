@@ -20,8 +20,8 @@
                     <div class="card-footer text-muted">
                         Добавлена: {{ quote.created_at|date:"d.m.Y" }} |
                         Просмотров: {{ quote.views }} |
-                        Лайков: {{ quote.likes }} |
-                        Дизлайков: {{ quote.dislikes }}
+                        Лайков: {{ quote.likes.count }} |
+                        Дизлайков: {{ quote.dislikes.count }}
                     </div>
                 </div>
             </div>

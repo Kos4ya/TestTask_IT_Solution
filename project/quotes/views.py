@@ -59,15 +59,8 @@ class LikeDislikeView(LoginRequiredMixin, View):
             if user in quote.likes.all():
                 quote.likes.remove(user)
             quote.dislikes.add(user)
-        elif action == 'remove_like':
-            quote.likes.remove(user)
-        elif action == 'remove_dislike':
-            quote.dislikes.remove(user)
-
-        # Перенаправляем обратно на предыдущую страницу
         if referer:
             return HttpResponseRedirect(referer)
-        # Если нет referer, перенаправляем на случайную цитату
         return HttpResponseRedirect(reverse('random_quote'))
 
 
@@ -79,7 +72,7 @@ class TopQuotesView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user'] = self.request.user  # Добавляем пользователя в контекст
+        context['user'] = self.request.user
         return context
 
 
